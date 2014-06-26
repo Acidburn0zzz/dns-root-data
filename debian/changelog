@@ -1,5 +1,5 @@
-dnssec-root-key (20100715-1) unstable; urgency=low
+dnssec-root-key (20100715) unstable; urgency=low
 
-  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+  * Initial release (Closes: #752745)
 
- -- Ondřej Surý <ondrej@debian.org>  Thu, 26 Jun 2014 09:21:39 +0200
+ -- Ondřej Surý <ondrej@debian.org>  Thu, 26 Jun 2014 10:46:45 +0200
