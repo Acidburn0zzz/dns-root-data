@@ -38,7 +38,7 @@ override_dh_auto_build:
 	diff root-anchors.ds root.ds
 
 override_dh_auto_clean:
-	rm root-anchors.ds root.ds
+	rm -f root-anchors.ds root.ds
 
 get_orig_source:
 	# Create root.key using unbound-anchor
