@@ -1,4 +1,4 @@
-Source: dnssec-root-key
+Source: dns-root-data
 Section: misc
 Priority: optional
 Maintainer: Ondřej Surý <ondrej@debian.org>
@@ -10,15 +10,16 @@ Build-Depends: debhelper (>= 8.0.0),
 	       libxml2-utils
 Standards-Version: 3.9.5
 Homepage: https://data.iana.org/root-anchors/
-#Vcs-Git: git://git.debian.org/collab-maint/dnssec-root-key.git
-#Vcs-Browser: http://git.debian.org/?p=collab-maint/dnssec-root-key.git;a=summary
+#Vcs-Git: git://git.debian.org/collab-maint/dns-root-data.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/dns-root-data.git;a=summary
 
-Package: dnssec-root-key
+Package: dns-root-data
 Architecture: all
-Depends: ${misc:Depends}, unbound-anchor
-Description: DNSSEC root key (trust anchors)
- This package contains DNSSEC root key in all available formats that
- all packages doing DNSSEC validation can use as a common data source.
+Depends: ${misc:Depends}
+Description: DNS root data including root zone and DNSSEC key
+ This package contains various root zone related data as published
+ by IANA to be used by various DNS software as a common source
+ of DNS root zone data, namely:
  .
- unbound-anchor is used to keep the root.key up-to-date
- via RFC5011 mechanism.
+  * Root Hints and Zone Files (root.hints, root.zone)
+  * Root Trust Anchors (root.key, root.ds)

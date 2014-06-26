@@ -1,6 +1,6 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: dnssec-root-key
-Source: https://data.iana.org/root-anchors/
+Upstream-Name: IANA Root Zone Management
+Source: http://www.iana.org/domains/root/files
 
 Files: *
 Copyright: Copyright (c) 2010 Internet Corporation For Assigned Names and Numbers

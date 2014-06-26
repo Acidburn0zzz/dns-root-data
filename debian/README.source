@@ -1,7 +1,7 @@
-dnssec-root-key for Debian
---------------------------
+dns-root-data for Debian
+------------------------
 
  The source files for this package was created by downloading IANA
  DNSSEC root-anchors directory from: http://data.iana.org/root-anchors/
 
- -- Ondřej Surý <ondrej@debian.org>, Thu, 26 Jun 2014 09:26:54 +0200
+ -- Ondřej Surý <ondrej@debian.org>, Thu, 26 Jun 2014 11:19:25 +0200

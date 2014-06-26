@@ -1,4 +1,4 @@
-dnssec-root-key (20100715) unstable; urgency=low
+dns-root-data (20100715) unstable; urgency=low
 
   * Initial release (Closes: #752745)
 

@@ -1,7 +1,0 @@
-dnssec-root-key for Debian
---------------------------
-
-The weekly update needs Internet connectivity to check for updated
-IANA root key.
-
- -- Ondřej Surý <ondrej@debian.org>, Thu, 26 Jun 2014 10:28:09 +0200

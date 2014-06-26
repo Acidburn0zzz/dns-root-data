@@ -37,6 +37,9 @@ override_dh_auto_build:
 	# Compare the DS from root.key and from root-anchors.xml
 	diff root-anchors.ds root.ds
 
+	# Verify signature on root.zone using validated root.key
+	dnssec-verify -o . root.zone root.key 
+
 override_dh_auto_clean:
 	rm -f root-anchors.ds root.ds
 
@@ -46,4 +49,5 @@ get_orig_source:
 	unbound-anchor \
 		-a $(CURDIR)/root.key \
 		-c $(CURDIR)/icannbundle.pem
-
+	wget -O $(CURDIR)/root.zone "http://www.internic.net/domain/root.zone"
+	wget -O $(CURDIR)/root.hints "http://www.internic.net/domain/named.root"
