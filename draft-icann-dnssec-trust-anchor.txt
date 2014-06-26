@@ -1,0 +1,560 @@
+
+
+
+Root DNSSEC Design Team                                         J. Abley
+                                                                   ICANN
+                                                             J. Schlyter
+                                                                   Kirei
+                                                             May 7, 2010
+
+
+           DNSSEC Trust Anchor Publication for the Root Zone
+
+Abstract
+
+   ICANN, as IANA Functions Operator, is responsible for the publication
+   of trust anchors for the root zone of the Domain Name System.
+
+   This document outlines the strategy by which those trust anchors are
+   published, and specifies initial mechanisms to be implemented in
+   conjunction with the initial signing of the root zone.
+
+Copyright Notice
+
+   Copyright (c) 2010 Internet Corporation For Assigned Names and
+   Numbers.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Abley & Schlyter                                                [Page 1]
+
+                   Root Zone Trust Anchor Publication           May 2010
+
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . . . 3
+   2.  Trust Anchor Publication Strategy . . . . . . . . . . . . . . . 3
+   3.  Trust Anchor Set Format . . . . . . . . . . . . . . . . . . . . 4
+     3.1.  XML . . . . . . . . . . . . . . . . . . . . . . . . . . . . 4
+     3.2.  Certificate Signing Request (PKCS#10) . . . . . . . . . . . 4
+   4.  Initial Publication Mechanisms  . . . . . . . . . . . . . . . . 5
+     4.1.  HTTP  . . . . . . . . . . . . . . . . . . . . . . . . . . . 5
+     4.2.  HTTP Over TLS . . . . . . . . . . . . . . . . . . . . . . . 5
+   5.  Signature Verification  . . . . . . . . . . . . . . . . . . . . 6
+   6.  References  . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+   Appendix A.  Trust Anchor Publication Document Schema . . . . . . . 7
+   Appendix B.  Example Signed Trust Anchor Set  . . . . . . . . . . . 8
+   Appendix C.  ASN.1 for Delegation Signer Extension  . . . . . . . . 9
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . . . 9
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Abley & Schlyter                                                [Page 2]
+
+                   Root Zone Trust Anchor Publication           May 2010
+
+
+1.  Introduction
+
+   The Domain Name System (DNS) is described in [RFC1034] and [RFC1035].
+   Security extensions to the DNS (DNSSEC) are described in [RFC4033],
+   [RFC4034] and [RFC4035].
+
+   A discussion of operational practices relating to DNSSEC can be found
+   in [RFC4641].
+
+   In DNSSEC a secure response to a query is one which is
+   cryptographically signed and validated.  An individual signature is
+   validated by following a chain of signatures to a key which is
+   trusted for some extra-protocol reason.
+
+   ICANN, as IANA Functions Operator, is responsible for the publication
+   of trust anchors for the root zone of the Domain Name System.
+
+   This document outlines the strategy by which those trust anchors are
+   published, and specifies initial mechanisms to be implemented in
+   conjunction with the initial signing of the root zone.
+
+
+2.  Trust Anchor Publication Strategy
+
+   Each trust anchor will be published in two formats:
+
+   o  in XML record format (as recommended in
+      [I-D.ietf-dnsop-dnssec-trust-anchor]), i.e. as the hash of the
+      corresponding DNSKEY in DS format,
+
+   o  as a Certificate Signing Request (CSR) in PKCS#10 format for
+      further processing by Certificate Authorities and validation of
+      proof of possession of the corresponding private key.
+
+   Operational procedures for KSK generation will include the generation
+   of a trust anchor and providing proof of possession of the
+   corresponding private key.  Those operational procedures, including
+   the specification of the signing mechanism are documented in
+   [ICANNDPS].  The execution of those procedures are be subject to
+   third-party audit.
+
+   Paper-copy representations of trust anchors will be distributed to
+   Key Generation Ceremony participants when the corresponding keys are
+   generated.  These participants may attest to the generated key in any
+   way they find suitable.
+
+   Trust anchor sets and short-hand representations thereof will be
+   distributed among the Key Generation Ceremony participants.  These
+
+
+
+Abley & Schlyter                                                [Page 3]
+
+                   Root Zone Trust Anchor Publication           May 2010
+
+
+   participants may attest to the generated key in any way they find
+   suitable.
+
+   In addition, the Trust Anchor set will be transported to the ICANN
+   Trust Anchor signing infrastructure (separate from the DNSSEC signing
+   infrastructure) in a secure manner, to preclude substitution attacks.
+   These signed Trust Anchor sets will then be published with these
+   signatures along with the original Certificate Signing Request.
+
+   This document specifies an initial set of publication mechanisms in
+   Section 4.  It is anticipated that additional mechanisms may be added
+   in the future.
+
+
+3.  Trust Anchor Set Format
+
+3.1.  XML
+
+   Trust anchors are published in XML documents whose schema is
+   described in Appendix A.  Each document contains a complete set of
+   trust anchors for the root zone, including anchors suitable for
+   immediate use and also historical data.
+
+   Examples of trust anchors packaged and signed for publication can be
+   found in Appendix B.
+
+3.2.  Certificate Signing Request (PKCS#10)
+
+   To facilitate signing the trust anchor by a public key
+   infrastructure, the trust anchor is also published as a Certificate
+   Signing Request (CSR) in PKCS#10 format [RFC2986].
+
+   The CSR will have a Subject with following attributes:
+
+   O: the string "ICANN".
+
+   OU:  the string "IANA".
+
+   CN:  the string "Root Zone KSK" combined with the timestamp (in ISO
+      8601 format) when the key was generated, e.g.  "Root Zone KSK
+      2009-10-10T01:08:42Z".
+
+   resourceRecord:  the delegation signer (DS) resource record of the
+      public key (see Appendix C for attribute definition).
+
+
+
+
+
+
+
+Abley & Schlyter                                                [Page 4]
+
+                   Root Zone Trust Anchor Publication           May 2010
+
+
+4.  Initial Publication Mechanisms
+
+4.1.  HTTP
+
+   Signed key sets will be made available by HTTP [RFC2616].
+
+   The URL for retrieving the CSR is
+   http://data.iana.org/root-anchors/<key-label>.csr.
+
+   The URL for retrieving the ICANN signed Certificate is
+   http://data.iana.org/root-anchors/<key-label>.crt.
+
+   The URL for retrieving the complete trust anchor set is
+   <http://data.iana.org/root-anchors/root-anchors.xml>.
+
+   The URL for a detached S/MIME signature for the current trust anchor
+   set is <http://data.iana.org/root-anchors/root-anchors.p7s>.
+
+   The URL for a detached OpenPGP [RFC4880] signature for the current
+   trust anchor set is
+   <http://data.iana.org/root-anchors/root-anchors.asc>.
+
+4.2.  HTTP Over TLS
+
+   Signed key sets will be made available by HTTP over TLS [RFC2818].
+
+   The URLs specified in Section 4.1 are also available using HTTPS.
+   That is:
+
+   The URL for retrieving the CSR is
+   https://data.iana.org/root-anchors/<key-label>.csr.
+
+   The URL for retrieving the ICANN signed Certificate is
+   https://data.iana.org/root-anchors/<key-label>.crt.
+
+   The URL for retrieving the complete trust anchor set is
+   <https://data.iana.org/root-anchors/root-anchors.xml>.
+
+   The URL for a detached S/MIME signature for the complete trust anchor
+   set is <https://data.iana.org/root-anchors/root-anchors.p7s>.
+
+   The URL for a detached OpenPGP [RFC4880] signature for the current
+   trust anchor set is
+   <https://data.iana.org/root-anchors/root-anchors.asc>.
+
+
+
+
+
+
+
+Abley & Schlyter                                                [Page 5]
+
+                   Root Zone Trust Anchor Publication           May 2010
+
+
+5.  Signature Verification
+
+   The OpenPGP [RFC4880] keys used to sign trust anchor documents will
+   themselves carry signatures from personal keys of ICANN operations
+   staff who are able to personally attest to their validity.  Those
+   staff members will endeavour to make their personal keys freely
+   available for examination by third parties, e.g. by way of PGP key
+   parties at operator and IETF meetings.  In this fashion a diverse set
+   of paths through the PGP web of trust will be maintained to the trust
+   anchor PGP keys.
+
+   An OpenPGP keyring containing public keys pertinent to signature
+   verification will be published at
+   <http://data.iana.org/root-anchors/icann.pgp>.  The public keys on
+   that keyring will also be distributed widely, e.g. to public PGP key
+   servers.
+
+   Certificates used to create S/MIME signatures will be signed by ICANN
+   and well-known (WebTrust-certified) Certificate Authorities at their
+   discretion, to facilitate signature validation with widely-available
+   X.509 trust anchors.
+
+
+6.  References
+
+   [I-D.ietf-dnsop-dnssec-trust-anchor]
+              Larson, M. and O. Gudmundsson, "DNSSEC Trust Anchor
+              Configuration and Maintenance",
+              draft-ietf-dnsop-dnssec-trust-anchor-03 (work in
+              progress), March 2009.
+
+   [ICANNDPS]
+              Ljunggren, F., Okubo, T., Lamb, R., and J. Schlyter,
+              "DNSSEC Practice Statement for the Root Zone KSK Operator
+              (DRAFT)", May 2010.
+
+   [RFC1034]  Mockapetris, P., "Domain names - concepts and facilities",
+              STD 13, RFC 1034, November 1987.
+
+   [RFC1035]  Mockapetris, P., "Domain names - implementation and
+              specification", STD 13, RFC 1035, November 1987.
+
+   [RFC2616]  Fielding, R., Gettys, J., Mogul, J., Frystyk, H.,
+              Masinter, L., Leach, P., and T. Berners-Lee, "Hypertext
+              Transfer Protocol -- HTTP/1.1", RFC 2616, June 1999.
+
+   [RFC2818]  Rescorla, E., "HTTP Over TLS", RFC 2818, May 2000.
+
+
+
+
+Abley & Schlyter                                                [Page 6]
+
+                   Root Zone Trust Anchor Publication           May 2010
+
+
+   [RFC2986]  Nystrom, M. and B. Kaliski, "PKCS #10: Certification
+              Request Syntax Specification Version 1.7", RFC 2986,
+              November 2000.
+
+   [RFC4033]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+              Rose, "DNS Security Introduction and Requirements",
+              RFC 4033, March 2005.
+
+   [RFC4034]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+              Rose, "Resource Records for the DNS Security Extensions",
+              RFC 4034, March 2005.
+
+   [RFC4035]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+              Rose, "Protocol Modifications for the DNS Security
+              Extensions", RFC 4035, March 2005.
+
+   [RFC4641]  Kolkman, O. and R. Gieben, "DNSSEC Operational Practices",
+              RFC 4641, September 2006.
+
+   [RFC4880]  Callas, J., Donnerhacke, L., Finney, H., Shaw, D., and R.
+              Thayer, "OpenPGP Message Format", RFC 4880, November 2007.
+
+
+Appendix A.  Trust Anchor Publication Document Schema
+
+   A Relax NG Compact Schema for the documents used to publish trust
+   anchors can be found in Figure 1.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Abley & Schlyter                                                [Page 7]
+
+                   Root Zone Trust Anchor Publication           May 2010
+
+
+   datatypes xsd = "http://www.w3.org/2001/XMLSchema-datatypes"
+
+   start = element TrustAnchor {
+       attribute id { xsd:string },
+       attribute source { xsd:string },
+       element Zone { xsd:string },
+
+       keydigest+
+   }
+
+   keydigest = element KeyDigest {
+       attribute id { xsd:string },
+       attribute validFrom { xsd:dateTime },
+       attribute validUntil { xsd:dateTime }?,
+
+       element KeyTag {
+               xsd:nonNegativeInteger { maxInclusive = "65535" } },
+       element Algorithm {
+               xsd:nonNegativeInteger { maxInclusive = "255" } },
+       element DigestType {
+               xsd:nonNegativeInteger { maxInclusive = "255" } },
+       element Digest { xsd:hexBinary }
+   }
+
+
+                                 Figure 1
+
+
+Appendix B.  Example Signed Trust Anchor Set
+
+   Figure 2 describes two trust anchors for the root zone such as might
+   be retrieved using the URL
+   <https://data.iana.org/root-anchors/root-anchors.xml>.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Abley & Schlyter                                                [Page 8]
+
+                   Root Zone Trust Anchor Publication           May 2010
+
+
+   <?xml version="1.0" encoding="UTF-8"?>
+
+   <TrustAnchor
+       id="AD42165F-B099-4778-8F42-D34A1D41FD93"
+       source="http://data.iana.org/root-anchors/root-anchors.xml">
+
+       <Zone>.</Zone>
+
+       <KeyDigest id="42"
+                  validFrom="2010-07-01T00:00:00-00:00"
+                  validUntil="2011-07-01T00:00:00-00:00">
+           <KeyTag>34291</KeyTag>
+           <Algorithm>5</Algorithm>
+           <DigestType>1</DigestType>
+           <Digest>c8cb3d7fe518835490af8029c23efbce6b6ef3e2</Digest>
+       </KeyDigest>
+
+   </TrustAnchor>
+
+
+                                 Figure 2
+
+
+Appendix C.  ASN.1 for Delegation Signer Extension
+
+
+
+   iana OBJECT IDENTIFIER ::= { iso(1) identified-organization(3)
+                                dod(6) internet(1) private(4)
+                                enterprise(1) 1000 }
+
+   iana-dns    OBJECT IDENTIFIER ::= { iana 53 }
+
+   resourceRecord ATTRIBUTE ::= {
+     WITH SYNTAX IA5String
+     EQUALITY MATCHING RULE caseIgnoreIA5Match
+     ID iana-dns
+   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+Abley & Schlyter                                                [Page 9]
+
+                   Root Zone Trust Anchor Publication           May 2010
+
+
+Authors' Addresses
+
+   Joe Abley
+   ICANN
+   4676 Admiralty Way, Suite 330
+   Marina del Rey, CA  90292
+   US
+
+   Phone: +1 519 670 9327
+   Email: joe.abley@icann.org
+
+
+   Jakob Schlyter
+   Kirei AB
+   P.O. Box 53204
+   Goteborg  SE-400 16
+   Sweden
+
+   Email: jakob@kirei.se
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Abley & Schlyter                                               [Page 10]
+

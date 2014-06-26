@@ -1,0 +1,8 @@
+draft-icann-dnssec-trust-anchor.* /usr/share/doc/dnssec-root-key/
+icannbundle.* /usr/share/dnssec-root-key/
+icann.pgp /usr/share/dnssec-root-key/
+*.crt /usr/share/dnssec-root-key/
+*.csr /usr/share/dnssec-root-key/
+root-anchors.* /usr/share/dnssec-root-key/
+root.key /etc/dns/
+root.ds  /etc/dns/

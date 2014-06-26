@@ -1,0 +1,49 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+%:
+	dh $@ 
+
+override_dh_auto_configure override_dh_auto_install:
+	:
+
+override_dh_auto_build:
+	# Verify root-anchors.xml using OpenSSL
+	openssl smime -verify -noverify -inform DER -in root-anchors.p7s -content root-anchors.xml
+
+	# Verify root-anchors.xml using OpenPGP
+	mkdir -m 0700 -p $(CURDIR)/.gnupg/
+	GNUPGHOME=$(CURDIR)/.gnupg/ gpg2 --quiet --import $(CURDIR)/icann.pgp
+	echo "2FBB91BCAAEE0ABE1F8031C7D1AFBCE00F6C91D2:6:" | \
+	GNUPGHOME=$(CURDIR)/.gnupg/ gpg2 --quiet --import-ownertrust
+	GNUPGHOME=$(CURDIR)/.gnupg/ gpg2 --quiet --verify root-anchors.asc root-anchors.xml
+	rm -rf .gnupg/
+
+	# Create key from validated root-anchors.xml
+	echo \
+	"$$(xmllint --xpath '//TrustAnchor/Zone/text()' root-anchors.xml) IN DS" \
+	"$$(xmllint --xpath '//TrustAnchor/KeyDigest/KeyTag/text()' root-anchors.xml)" \
+	"$$(xmllint --xpath '//TrustAnchor/KeyDigest/Algorithm/text()' root-anchors.xml)" \
+	"$$(xmllint --xpath '//TrustAnchor/KeyDigest/DigestType/text()' root-anchors.xml)" \
+	"$$(xmllint --xpath '//TrustAnchor/KeyDigest/Digest/text()' root-anchors.xml)" > \
+	root-anchors.ds
+
+	# Create key from downloaded root.key
+	dnssec-dsfromkey -2 root.key > root.ds
+
+	# Compare the DS from root.key and from root-anchors.xml
+	diff root-anchors.ds root.ds
+
+override_dh_auto_clean:
+	rm root-anchors.ds root.ds
+
+get_orig_source:
+	# Create root.key using unbound-anchor
+	# This needs Internet connection
+	unbound-anchor \
+		-a $(CURDIR)/root.key \
+		-c $(CURDIR)/icannbundle.pem
+

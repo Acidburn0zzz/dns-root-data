@@ -1,0 +1,3 @@
+#!/bin/sh
+unbound-anchor -a /etc/dns/root.key \
+               -c /usr/share/dnssec-root-key/icannbundle.pem
